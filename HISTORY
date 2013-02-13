@@ -1,5 +1,9 @@
 = Release History
 
+== 2.5.0.1 / 2013-01-13 Koji Nakamaru
+
+* Applied http://www.ruby-forum.com/topic/4405019.
+
 == 2.5.0 / 2013-01-27 Charlie Savage
 
 * Compatibility with older versions for IO::write (rb_io_bufwrite is specific to ruby >= 1.9.3?)
