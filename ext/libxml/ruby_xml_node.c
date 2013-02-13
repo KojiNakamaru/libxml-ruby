@@ -398,11 +398,12 @@ static VALUE rxml_node_content_get(VALUE self)
 static VALUE rxml_node_content_set(VALUE self, VALUE content)
 {
   xmlNodePtr xnode;
+  xmlChar* encoded_content;
 
   Check_Type(content, T_STRING);
   xnode = rxml_get_xnode(self);
-  // XXX docs indicate need for escaping entites, need to be done? danj
-  xmlNodeSetContent(xnode, (xmlChar*) StringValuePtr(content));
+  encoded_content = xmlEncodeSpecialChars(xnode->doc, (xmlChar*) StringValuePtr(content));
+  xmlNodeSetContent(xnode, encoded_content);
   return (Qtrue);
 }
 
@@ -619,10 +620,17 @@ static VALUE rxml_node_to_s(int argc, VALUE *argv, VALUE self)
   xmlNodeDumpOutput(output, xnode->doc, xnode, level, indent, xencoding);
   xmlOutputBufferFlush(output);
 
+#ifdef LIBXML2_NEW_BUFFER
+  if (output->conv)
+    result = rxml_new_cstr((const char*) xmlBufContent(output->conv), xencoding);
+  else
+    result = rxml_new_cstr((const char*) xmlBufContent(output->buffer), xencoding);
+#else
   if (output->conv)
     result = rxml_new_cstr((const char*) output->conv->content, xencoding);
   else
     result = rxml_new_cstr((const char*) output->buffer->content, xencoding);
+#endif
 
   xmlOutputBufferClose(output);
   

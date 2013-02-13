@@ -53,10 +53,12 @@ end
 # RDoc Task
 desc "Generate rdoc documentation"
 RDoc::Task.new("rdoc") do |rdoc|
-  rdoc.rdoc_dir = 'doc/libxml-ruby/rdoc'
+  rdoc.rdoc_dir = 'website/_site/rdoc'
   rdoc.title    = "LibXML"
   # Show source inline with line numbers
   rdoc.options << "--line-numbers"
+  rdoc.options << "--charset=utf-8"
+  rdoc.options << "--format=hanna"
   # Make the readme file the start page for the generated html
   rdoc.main = 'README.rdoc'
   rdoc.rdoc_files.include('doc/*.rdoc',
@@ -74,6 +76,3 @@ Rake::TestTask.new do |t|
   t.libs << "test"
   t.verbose = true
 end
-
-desc "Build docs, and publish the website"
-task :publish_with_docs => [:rdoc, :publish]
