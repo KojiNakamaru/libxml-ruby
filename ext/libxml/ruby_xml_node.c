@@ -50,9 +50,8 @@ static void rxml_node_deregisterNode(xmlNodePtr xnode)
       try to free the node a second time. */
     VALUE node = (VALUE) xnode->_private;
     RDATA(node)->data = NULL;
-// cf. http://www.ruby-forum.com/topic/4405019
-//    RDATA(node)->dfree = NULL;
-//    RDATA(node)->dmark = NULL;
+    RDATA(node)->dfree = NULL;
+    RDATA(node)->dmark = NULL;
   }
 }
 
