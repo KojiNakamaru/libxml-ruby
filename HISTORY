@@ -3,6 +3,7 @@
 == 2.7.0.1 / 2013-03-04 Koji Nakamaru
 
 * Merged master and reverted http://www.ruby-forum.com/topic/4405019.
+* Simplified extconf.rb further.
 
 == 2.7.0 / 2013-08-03 Charlie Savage
 
