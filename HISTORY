@@ -1,5 +1,23 @@
 = Release History
 
+== 2.7.0.1 / 2013-03-04 Koji Nakamaru
+
+* Merged master and reverted http://www.ruby-forum.com/topic/4405019.
+
+== 2.7.0 / 2013-08-03 Charlie Savage
+
+* Do not call Ruby code during a GC cycle (Dirkjan Bussink)
+* Fix thread error handling (Geoffrey Giesemann)
+* Set libxml error handler when a libxml-ruby error handler is set (Geoffrey Giesemann)
+* Fix tests for nil TypeErrors (Geoffrey Giesemann)
+* Fix segmentation fault for issue #62.  The deregisternode function was incorrectly
+  NULLing out a node's mark and free functions for nodes removed from a document tree (Charlie Savage)
+* Cleanup writer code (Charlie Savage)
+* Fix equality check of LibXML::XML::Error against other objects (Michał Szajbe)
+* Fix XML::Writer.set_quote_char UT, wrong expected string (#63).  (julp)
+* Fix potential segfault when GC occurs while creating ns from xpath (Timothy Elliott)
+* Fix segmentation fault after failing to load external schema (#59).  (Clifford Heath)
+
 == 2.6.0.1 / 2013-03-04 Koji Nakamaru
 
 * Applied http://www.ruby-forum.com/topic/4405019.

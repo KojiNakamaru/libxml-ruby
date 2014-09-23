@@ -34,7 +34,6 @@ typedef struct {
     xmlBufferPtr buffer;
     xmlTextWriterPtr writer;
     rxmlw_output_type output_type;
-    int closed;
 } rxml_writer_object;
 
 #ifdef HAVE_RUBY_ENCODING_H
@@ -73,8 +72,6 @@ static void rxml_writer_free(rxml_writer_object *rwo)
         xmlBufferFree(rwo->buffer);
     }
 #endif
-
-    rwo->closed = 1;
     xmlFreeTextWriter(rwo->writer);
     xfree(rwo);
 }
@@ -98,17 +95,6 @@ static rxml_writer_object *rxml_textwriter_get(VALUE obj)
     Data_Get_Struct(obj, rxml_writer_object, rwo);
 
     return rwo;
-}
-
-int rxml_writer_write_callback(void *context, const char *buffer, int len)
-{
-  rxml_writer_object *rwo = context;
-
-  if(rwo->closed){
-    return 0;
-  }else{
-    return rxml_write_callback((void *)rwo->output, buffer, len);
-  }
 }
 
 /* ===== public class methods ===== */
@@ -136,12 +122,11 @@ xmlCharEncodingHandlerPtr xmlFindCharEncodingHandler(const char * name);
     rwo = ALLOC(rxml_writer_object);
     rwo->output = io;
     rwo->buffer = NULL;
-    rwo->closed = 0;
 #ifdef HAVE_RUBY_ENCODING_H
     rwo->encoding = NULL;
 #endif /* HAVE_RUBY_ENCODING_H */
     rwo->output_type = RXMLW_OUTPUT_IO;
-    if (NULL == (out = xmlOutputBufferCreateIO(rxml_writer_write_callback, NULL, (void *) rwo, NULL))) {
+    if (NULL == (out = xmlOutputBufferCreateIO(rxml_write_callback, NULL, (void *) io, NULL))) {
         rxml_raise(&xmlLastError);
     }
     if (NULL == (rwo->writer = xmlNewTextWriter(out))) {
@@ -165,7 +150,6 @@ static VALUE rxml_writer_file(VALUE klass, VALUE filename)
     rwo = ALLOC(rxml_writer_object);
     rwo->output = Qnil;
     rwo->buffer = NULL;
-    rwo->closed = 0;
 #ifdef HAVE_RUBY_ENCODING_H
     rwo->encoding = NULL;
 #endif /* HAVE_RUBY_ENCODING_H */
@@ -188,7 +172,6 @@ static VALUE rxml_writer_string(VALUE klass)
 
     rwo = ALLOC(rxml_writer_object);
     rwo->output = Qnil;
-    rwo->closed = 0;
 #ifdef HAVE_RUBY_ENCODING_H
     rwo->encoding = NULL;
 #endif /* HAVE_RUBY_ENCODING_H */
@@ -217,7 +200,6 @@ static VALUE rxml_writer_doc(VALUE klass)
     rwo = ALLOC(rxml_writer_object);
     rwo->buffer = NULL;
     rwo->output = Qnil;
-    rwo->closed = 0;
 #ifdef HAVE_RUBY_ENCODING_H
     rwo->encoding = NULL;
 #endif /* HAVE_RUBY_ENCODING_H */
@@ -252,7 +234,6 @@ static VALUE rxml_writer_flush(int argc, VALUE *argv, VALUE self)
     if (-1 == (ret = xmlTextWriterFlush(rwo->writer))) {
         rxml_raise(&xmlLastError);
     }
-
     if (NULL != rwo->buffer) {
         VALUE content;
 
